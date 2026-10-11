@@ -1,0 +1,726 @@
+<title>منصة امتحانات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centered column on a navy ground. Login is a light/dark card; exam screens are always dark navy with gold. */
+:root{
+  --ground:#091a3b; --ground-2:#0f2f6b;
+  --card:#ffffff; --fg:#1b2333; --muted:#5b667c; --field:#f5f7fb; --line:#d9dfe9; --panel:#e8eefc;
+  --accent:#1a73e8; --accent-d:#1558b8; --violet:#6d3df0;
+  --gold:#f4d68a; --gold-d:#c9a24a; --gold-dd:#a47a22; --on-gold:#2a1d02;
+  --x-card:#12234a; --x-card-2:#0e1c3d; --x-line:#2c3d62; --x-fg:#eaf0ff; --x-muted:#9fb0d0;
+  --ok:#35c47a; --bad:#ef5b60; --warn:#f2a93b; --orange:#ff6b35; --red:#d93636;
+  --shadow:0 30px 60px -20px rgba(0,0,0,.55);
+  --f-display:"Cairo","Tajawal",system-ui,"Segoe UI",Tahoma,sans-serif;
+  --f-body:"Tajawal","Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --card:#101b36; --fg:#e9efff; --muted:#9aa8c6; --field:#0a1226; --line:#26365c; --panel:#15244a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --card:#101b36; --fg:#e9efff; --muted:#9aa8c6; --field:#0a1226; --line:#26365c; --panel:#15244a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  direction:rtl; font-family:var(--f-body); font-size:16px; line-height:1.6;
+  background:radial-gradient(900px 520px at 85% -5%,var(--ground-2),transparent 60%),var(--ground);
+  color:var(--fg); padding-inline:16px; padding-block:24px 96px;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--gold-d);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+.shell,.xwrap{width:100%;max-width:480px;margin-inline:auto;display:flex;flex-direction:column;min-width:0}
+.xwrap{max-width:560px;color:var(--x-fg);gap:20px}
+
+/* ---------- login card ---------- */
+.card{position:relative;background:var(--card);color:var(--fg);border-radius:36px;padding:30px 22px 28px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px;min-width:0}
+.theme{position:absolute;top:22px;left:22px;height:44px;min-width:70px;padding:0 14px;border-radius:999px;border:2px solid var(--accent);background:var(--card);font-size:20px}
+.logo{align-self:center;margin-top:34px;width:116px;height:116px;border-radius:32px;display:grid;place-items:center;font-size:58px;background:linear-gradient(145deg,#2563eb,#7c3aed);box-shadow:0 18px 40px -10px rgba(76,90,240,.55)}
+.brand{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,10vw,46px);text-align:center;line-height:1.3;background:linear-gradient(90deg,var(--accent),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.who{text-align:center;color:var(--muted);font-size:20px;margin-top:-6px;margin-bottom:6px}
+form{display:flex;flex-direction:column;gap:14px}
+.field{height:58px;width:100%;border-radius:20px;border:2px solid var(--line);background:var(--field);padding:0 20px;font-size:18px;min-width:0}
+textarea.field{height:auto;min-height:120px;padding:14px 20px;resize:vertical;line-height:1.7}
+select.field{appearance:auto}
+.ltr{direction:ltr;text-align:left}
+.btn{height:58px;border-radius:22px;font-family:var(--f-display);font-weight:800;font-size:19px;color:#fff;padding:0 18px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-blue{background:linear-gradient(90deg,#1a73e8,#1558b8);box-shadow:0 14px 28px -12px rgba(26,115,232,.7)}
+.btn-gold{background:linear-gradient(90deg,#dcb865,#b8902f);color:var(--on-gold)}
+.btn-orange{background:linear-gradient(90deg,var(--orange),var(--red));box-shadow:0 14px 28px -14px rgba(217,54,54,.7)}
+.err{color:#d6343a;font-weight:700;font-size:15px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#ff8a8f}}
+:root[data-theme="dark"] .err{color:#ff8a8f}
+.or{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:20px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.panel{background:var(--panel);border-radius:28px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--accent)}
+.panel p{color:var(--fg);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:12px}
+.chip{border:2px solid var(--accent);background:var(--card);border-radius:22px;padding:10px 22px 12px;display:flex;flex-direction:column;align-items:center;min-width:0;max-width:100%}
+.chip b{font-family:var(--f-display);font-weight:800;font-size:34px;color:var(--accent);line-height:1.2;font-variant-numeric:tabular-nums}
+.chip span{font-weight:700;font-size:14px;overflow-wrap:anywhere;text-align:center}
+.btn-plain{height:50px;border-radius:18px;border:2px solid var(--line);background:var(--field);font-weight:700;padding:0 22px;align-self:center}
+.hr{height:1px;background:var(--line);margin-block:4px}
+
+/* ---------- credits chip ---------- */
+.credits{position:fixed;inset-inline-end:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));max-width:min(340px,calc(100% - 28px));background:#fff;color:#1b2333;border:2px solid #d9dfe9;border-radius:24px;padding:12px 18px;box-shadow:0 14px 34px -10px rgba(0,0,0,.5);font-size:15px;line-height:1.9;z-index:20}
+.credits button{position:absolute;top:2px;left:6px;font-size:20px;line-height:1;padding:6px;color:#5b667c}
+.credits b{font-weight:800}
+
+/* ---------- exam screens (always dark) ---------- */
+.hero{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding-top:8px}
+.seal{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;font-size:64px;background:linear-gradient(135deg,#e6c875,#f6dc96 45%,#b98f3a);box-shadow:0 0 0 12px rgba(244,214,138,.1),0 0 0 26px rgba(244,214,138,.05)}
+.hero h1{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,9vw,46px);color:var(--gold);margin-top:22px;line-height:1.3}
+.rule{width:140px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-d),transparent)}
+.hero p{color:var(--gold-d);font-weight:700;font-size:19px}
+.xcard{background:var(--x-card);border:2px solid var(--x-line);border-radius:36px;padding:26px 22px;min-width:0}
+.welcome{text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(26px,7vw,34px);color:var(--gold);padding-block:34px;line-height:1.6}
+.sect{font-family:var(--f-display);font-weight:800;font-size:22px;text-align:center;margin-top:8px}
+.list{display:flex;flex-direction:column;gap:18px}
+.exam{display:flex;align-items:center;gap:16px;text-align:start;width:100%;color:inherit;background:var(--x-card);border:2px solid var(--x-line);border-radius:36px;padding:22px;min-width:0}
+button.exam:hover{border-color:var(--gold-d)}
+.exam .ico{flex:none;width:72px;height:72px;border-radius:24px;background:rgba(244,214,138,.12);border:2px solid var(--x-line);display:grid;place-items:center;font-size:36px}
+.exam .txt{flex:1;min-width:0}
+.exam h3{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--gold);line-height:1.5}
+.exam p{color:var(--x-muted);font-size:16px;margin-top:4px;overflow-wrap:anywhere}
+.exam .side{flex:none;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.pill{border-radius:999px;border:2px solid var(--x-line);background:rgba(244,214,138,.08);color:var(--gold);padding:6px 16px;font-weight:800;font-size:16px;text-align:center;white-space:nowrap}
+.pill.lock{color:#ff8a8f;border-color:rgba(239,91,96,.45);background:rgba(239,91,96,.1)}
+.pill.done{color:var(--ok);border-color:rgba(53,196,122,.45);background:rgba(53,196,122,.1)}
+.exam.locked{opacity:.62}
+.exam.locked h3,.exam.locked p{color:var(--x-muted)}
+@media (max-width:440px){.exam{flex-wrap:wrap}.exam .side{flex-direction:row;flex-wrap:wrap;order:3;width:100%}}
+.ghost{align-self:center;border:2px solid var(--x-line);color:var(--x-muted);border-radius:999px;height:54px;padding:0 34px;font-weight:700;font-size:18px}
+.ghost.sm{height:42px;padding:0 18px;font-size:15px;align-self:auto}
+.ghost.danger{color:#ff8a8f;border-color:rgba(239,91,96,.45)}
+.ghost.on{color:var(--gold);border-color:var(--gold-d)}
+
+/* quiz */
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.qtitle{font-family:var(--f-display);font-weight:800;color:var(--gold);font-size:20px;text-align:end;min-width:0;overflow-wrap:anywhere}
+.prog{height:10px;border-radius:99px;background:var(--x-line);overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dd),var(--gold));border-radius:99px;transition:width .25s}
+.qmeta{color:var(--x-muted);font-weight:500;text-align:center}
+.qtext{font-family:var(--f-display);font-weight:700;font-size:23px;line-height:1.8;margin-bottom:18px;overflow-wrap:anywhere}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;text-align:start;border:2px solid var(--x-line);background:var(--x-card-2);border-radius:22px;padding:14px 16px;font-size:18px;font-weight:500;color:var(--x-fg);min-width:0;overflow-wrap:anywhere}
+.opt .l{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--x-line);font-weight:800}
+.opt.sel{border-color:var(--gold);background:rgba(244,214,138,.1)}
+.opt.sel .l{background:var(--gold);color:var(--on-gold)}
+.opt.ok{border-color:var(--ok);background:rgba(53,196,122,.1)}
+.opt.bad{border-color:var(--bad);background:rgba(239,91,96,.1)}
+.dots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.dot{width:40px;height:40px;border-radius:12px;border:2px solid var(--x-line);color:var(--x-muted);font-weight:800}
+.dot.a{background:rgba(244,214,138,.15);color:var(--gold);border-color:var(--gold-d)}
+.dot.c{background:var(--gold);color:var(--on-gold);border-color:var(--gold)}
+.nav{display:flex;gap:12px}
+.nav>*{flex:1}
+.xbtn{height:56px;border-radius:20px;font-family:var(--f-display);font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;padding:0 16px;border:2px solid var(--x-line);color:var(--x-fg);width:100%}
+.xbtn.gold{background:linear-gradient(90deg,#dcb865,#b8902f);color:var(--on-gold);border-color:transparent}
+.xbtn:disabled{opacity:.4;cursor:not-allowed}
+.warn{background:rgba(242,169,59,.12);border:2px solid rgba(242,169,59,.45);color:#ffd08a;border-radius:20px;padding:12px 16px;font-weight:700;text-align:center}
+
+/* result */
+.score{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.ring{--p:0;width:170px;height:170px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ok) calc(var(--p)*1%),var(--x-line) 0)}
+.ring div{width:138px;height:138px;border-radius:50%;background:var(--x-card);display:grid;place-items:center;align-content:center}
+.ring b{font-family:var(--f-display);font-weight:900;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.ring span{color:var(--x-muted);font-weight:700}
+.grade{font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--gold)}
+.codebox{border:2px dashed var(--gold-d);border-radius:26px;padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.codebox small{color:var(--x-muted);font-weight:500}
+.codebox b{font-family:var(--f-display);font-weight:900;font-size:44px;letter-spacing:4px;color:var(--gold);line-height:1.2;font-variant-numeric:tabular-nums}
+.rev{display:flex;flex-direction:column;gap:22px}
+.rev h3{font-size:18px;font-weight:700;line-height:1.8;margin-bottom:10px;overflow-wrap:anywhere}
+.rev .opt{padding:10px 14px;font-size:16px}
+
+/* teacher */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tabs .ghost{height:44px;padding:0 18px;font-size:16px}
+.titem{display:flex;flex-direction:column;gap:14px;background:var(--x-card);border:2px solid var(--x-line);border-radius:28px;padding:20px;min-width:0}
+.titem h3{font-family:var(--f-display);font-weight:800;color:var(--gold);font-size:20px;overflow-wrap:anywhere}
+.titem p,.titem small{color:var(--x-muted);overflow-wrap:anywhere}
+.tbtns{display:flex;flex-wrap:wrap;gap:8px}
+.xf{display:flex;flex-direction:column;gap:12px}
+.xf label{font-weight:700;font-size:15px;color:var(--x-muted)}
+.xf .field{background:var(--x-card-2);border-color:var(--x-line);color:var(--x-fg);height:52px;font-size:17px}
+.xf textarea.field{height:auto}
+.qrow{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;border-top:1px solid var(--x-line);padding-top:10px;font-size:15px}
+.qrow span{min-width:0;overflow-wrap:anywhere}
+.empty{color:var(--x-muted);text-align:center;padding:14px}
+.stat{color:var(--x-muted);text-align:center;font-weight:500}
+
+/* modal + toast */
+.ov{position:fixed;inset:0;background:rgba(3,10,26,.72);display:grid;place-items:center;padding:16px;z-index:30;overflow-y:auto}
+.modal{width:100%;max-width:440px;background:var(--card);color:var(--fg);border-radius:30px;padding:24px 20px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.modal h2{font-family:var(--f-display);font-weight:800;font-size:22px}
+.modal .row{display:flex;gap:10px}
+.modal .row>*{flex:1}
+#toasts{position:fixed;inset-inline:16px;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;z-index:40;pointer-events:none}
+.toast{background:#fff;color:#1b2333;border-radius:16px;padding:12px 20px;font-weight:700;box-shadow:0 12px 30px -8px rgba(0,0,0,.5);max-width:420px;text-align:center}
+.qimg{display:block;max-width:100%;max-height:360px;margin:0 auto 18px;border-radius:18px;border:2px solid var(--x-line);object-fit:contain;background:#fff}
+.thumb{width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--x-line);flex:none}
+.xf .chk{display:flex;align-items:center;gap:10px;color:var(--x-fg);font-size:16px}
+.xf .chk input{width:22px;height:22px;accent-color:var(--gold-d)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;direction:ltr;text-align:left;font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============ data layer (swap these four functions for a real backend later) ============ */
+var KEY = "exam-platform-v1", DEVKEY = "exam-platform-dev-v1";
+var LS = (function(){ try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); return true; } catch(e){ return false; } })();
+function jget(k){ try { var s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+function jset(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+function seed(){
+  return {
+    settings:{ platform:"منصة امتحانات", teacher:"اسم المدرس", listTitle:"امتحانات المنصة", pass:"1234", devPass:"dev@1234", credits:["Yousef Saeed","",""], features:{ complaints:true, notif:true } },
+    exams:[
+      { id:"e1", title:"امتحان عربي (مستوى متوسط)", desc:"نحو وبلاغة، ستة أسئلة اختيار من متعدد.", locked:true, questions:[
+        { q:"الفاعل في جملة: (ذهبَ الطالبُ إلى المدرسة) هو:", opts:["الطالبُ","المدرسة","ذهبَ","إلى"], ans:0 },
+        { q:"علامة نصب جمع المؤنث السالم:", opts:["الفتحة","الكسرة","الياء","الألف"], ans:1 },
+        { q:"الحرف (إنّ) من الحروف الناسخة، وهو:", opts:["ينصب المبتدأ ويرفع الخبر","ينصب الخبر ويرفع المبتدأ","ينصب الفاعل","يجر المفعول به"], ans:0 },
+        { q:"نوع الأسلوب في: (ما أجملَ السماءَ!)", opts:["تعجب","استفهام","نهي","أمر"], ans:0 },
+        { q:"المثنى من كلمة (معلّم) في حالة الرفع:", opts:["معلّمان","معلّمين","معلّمون","معلّمات"], ans:0 },
+        { q:"الجملة (العلمُ نورٌ) جملة:", opts:["اسمية","فعلية","شبه جملة","شرطية"], ans:0 }
+      ]},
+      { id:"e2", title:"امتحان برمجة: مستوى صعب!", desc:"امتحان تجريبي في أساسيات البرمجة. اقرأ كل سؤال كويس قبل ما تختار.", locked:false, questions:[
+        { q:"أي لغة تُستخدم لتنسيق شكل صفحات الويب؟", opts:["CSS","SQL","Python","C"], ans:0 },
+        { q:"ناتج التعبير 2 + 3 * 4 هو:", opts:["20","14","24","12"], ans:1 },
+        { q:"أي مما يلي ليس نوع بيانات أساسي في JavaScript؟", opts:["String","Number","Boolean","Folder"], ans:3 },
+        { q:"الحلقة التي تكرر الكود طالما الشرط صحيح هي:", opts:["while","if","switch","return"], ans:0 },
+        { q:"وظيفة الأمر console.log هي:", opts:["طباعة قيمة في وحدة التحكم","حذف متغير","فتح ملف","إغلاق البرنامج"], ans:0 },
+        { q:"رمز المقارنة بالقيمة والنوع معاً في JavaScript:", opts:["=","==","===","=>"], ans:2 }
+      ]}
+    ],
+    results:[], complaints:[]
+  };
+}
+var db = jget(KEY) || seed();
+function fixDb(){
+  var st = db.settings = db.settings || {};
+  if (!st.credits) st.credits = ["Yousef Saeed","",""];
+  if (!st.credits[0] || st.credits[0] === "يوسف سعيد") st.credits[0] = "Yousef Saeed";
+  if (!st.devPass) st.devPass = "dev@1234";
+  if (!st.pass) st.pass = "1234";
+  if (!st.features) st.features = { complaints:true, notif:true };
+  db.exams = db.exams || []; db.results = db.results || []; db.complaints = db.complaints || [];
+}
+fixDb();
+var dev = jget(DEVKEY) || { notif:true, codes:[], theme:null };
+function save(){ if (!jset(KEY, db) && LS) toast("المساحة امتلت ولم يتم حفظ التغيير. قلّل عدد الصور أو احذف أسئلة قديمة."); }
+function saveDev(){ jset(DEVKEY, dev); }
+
+/* ============ helpers ============ */
+var $app = document.getElementById("app");
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function digits(s){ return String(s).replace(/[٠-٩]/g, function(d){ return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).replace(/[۰-۹]/g, function(d){ return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }); }
+function examById(id){ return db.exams.filter(function(e){ return e.id === id; })[0]; }
+function myResults(){ return db.results.filter(function(r){ return dev.codes.indexOf(r.code) > -1; }); }
+function fmtDate(ts){ var d = new Date(ts); return d.toLocaleDateString("en-GB") + " " + d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
+function gradeOf(p){ return p >= 85 ? "ممتاز 🌟" : p >= 70 ? "جيد جداً" : p >= 50 ? "جيد" : "محتاج مذاكرة أكتر"; }
+function toast(msg){
+  var box = document.getElementById("toasts"), t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg; box.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2800);
+}
+function applyTheme(){
+  var r = document.documentElement;
+  if (dev.theme) r.setAttribute("data-theme", dev.theme); else r.removeAttribute("data-theme");
+}
+function notify(title, body){
+  try { if (dev.notif && "Notification" in window && Notification.permission === "granted") new Notification(title, { body: body }); } catch(e){}
+}
+function askNotifPermission(){
+  try { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); } catch(e){}
+}
+
+function safeImg(s){ return typeof s === "string" && s.length < 1500000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(s) ? s : ""; }
+function imgTag(s, cls){ var u = safeImg(s); return u ? '<img class="' + cls + '" src="' + u + '" alt="صورة السؤال">' : ""; }
+function imgFor(r, i, q){ var ex = examById(r.examId), x = ex && ex.questions[i]; return x && x.q === q.q ? x.img : ""; }
+function shrinkImage(file, cb){
+  var fr = new FileReader();
+  fr.onerror = function(){ cb(""); };
+  fr.onload = function(){
+    var im = new Image();
+    im.onerror = function(){ cb(""); };
+    im.onload = function(){
+      var k = Math.min(1, 900 / Math.max(im.width, im.height));
+      var c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+      cb(c.toDataURL("image/jpeg", 0.78));
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+function parseBulk(text){
+  var out = [], blocks = String(text).replace(/\r/g, "").split(/\n\s*\n/);
+  var map = { "أ":0,"ا":0,"a":0,"A":0,"ب":1,"b":1,"B":1,"ج":2,"c":2,"C":2,"د":3,"d":3,"D":3 };
+  blocks.forEach(function(b){
+    var lines = b.split("\n").map(function(x){ return x.trim(); }).filter(Boolean);
+    if (lines.length < 4) return;
+    var q = lines[0].replace(/^[\d٠-٩]+\s*[-.)]\s*/, ""), opts = [], ans = -1;
+    lines.slice(1).forEach(function(l){
+      var m = l.match(/^(?:الإجابة|الاجابة|الإجابة الصحيحة|answer)\s*[:：]\s*([أاابجدabcdABCD])/i);
+      if (m){ ans = map[m[1]] !== undefined ? map[m[1]] : -1; return; }
+      var o = l.match(/^([أاابجدabcdABCD])\s*[-.)]\s*(.+)$/);
+      if (o) opts.push(o[2]);
+    });
+    if (q && opts.length >= 2 && ans >= 0 && ans < opts.length) out.push({ q: q, opts: opts, ans: ans });
+  });
+  return out;
+}
+var tapN = 0, tapT = null;
+
+/* ============ state ============ */
+var S = { view:"login", student:null, exam:null, qi:0, ans:[], res:null, from:"login", modal:null, err:"", verr:"", cerr:"", terr:"",
+          tTab:"exams", tEdit:null, tNew:false, confirm:false, pd:null, hideCredits:false, reset:false, qImg:"", bulk:false, berr:"", dTab:"overview", dauth:false, derr:"" };
+var draft = {};
+applyTheme();
+
+function go(view){ S.view = view; S.modal = null; S.pd = null; S.err = ""; S.reset = true; render(); }
+function twoStep(key){
+  if (S.pd === key){ S.pd = null; return true; }
+  S.pd = key; render();
+  setTimeout(function(){ if (S.pd === key){ S.pd = null; render(); } }, 4000);
+  return false;
+}
+
+/* ============ views ============ */
+function creditsHtml(){
+  var c = db.settings.credits || [], labels = ["المبرمج","إضافة أسئلة","تصميم"], lines = [];
+  for (var i = 0; i < 3; i++) if (c[i]) lines.push("<div><b>" + labels[i] + ":</b> " + esc(c[i]) + "</div>");
+  if (!lines.length || S.hideCredits || S.view !== "login") return "";
+  return '<aside class="credits">' + lines.join("") + '<button data-act="hidecredits" aria-label="إخفاء">×</button></aside>';
+}
+
+function loginView(){
+  var mine = myResults(), st = db.settings;
+  var codes = mine.length ? '<section class="panel"><h2>🔑 أكوادك (اضغط على الكود لعرض النتيجة):</h2><div class="chips">' +
+    mine.map(function(r){ return '<button class="chip" data-act="opencode" data-code="' + esc(r.code) + '"><b>' + esc(r.code) + '</b><span>' + esc(r.examTitle) + '</span></button>'; }).join("") +
+    '</div></section>' : "";
+  var notifOn = dev.notif;
+  return '<main class="shell"><section class="card">' +
+    '<button class="theme" data-act="theme" aria-label="تبديل الوضع الليلي">🌓</button>' +
+    '<div class="logo" data-act="logo" aria-hidden="true">📚</div>' +
+    '<h1 class="brand">' + esc(st.platform) + '</h1>' +
+    '<p class="who">' + esc(st.teacher) + '</p>' +
+    '<form id="f-login" novalidate>' +
+      '<input class="field" id="l-name" name="name" autocomplete="name" placeholder="اسمك الثلاثي" aria-label="اسم الطالب">' +
+      '<input class="field ltr" id="l-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="رقم الموبايل" aria-label="رقم الموبايل">' +
+      (S.err ? '<p class="err" role="alert">' + esc(S.err) + '</p>' : "") +
+      '<button class="btn btn-blue" type="submit">🚀 دخول الامتحان</button>' +
+    '</form>' +
+    '<div class="or"><span>أو</span></div>' +
+    '<button class="btn btn-gold" data-act="teacher">🔐 دخول المدرس</button>' +
+    codes +
+    '<section class="panel"><h2>🔍 تحقق من نتيجتك بالكود</h2>' +
+      '<form id="f-verify" novalidate>' +
+        '<select class="field" id="v-exam" aria-label="الامتحان"><option value="">🔎 أي امتحان (تلقائي)</option>' +
+          db.exams.map(function(e){ return '<option value="' + esc(e.id) + '">' + esc(e.title) + '</option>'; }).join("") + '</select>' +
+        '<input class="field ltr" id="v-code" inputmode="numeric" placeholder="الكود" aria-label="كود النتيجة">' +
+        (S.verr ? '<p class="err" role="alert">' + esc(S.verr) + '</p>' : "") +
+        '<button class="btn btn-blue" type="submit">🔍 عرض نتيجتي</button>' +
+      '</form></section>' +
+    (db.settings.features.notif ? '<section class="panel" style="text-align:center"><p>' + (notifOn ? "🔔 إشعارات الامتحانات الجديدة مفعّلة على هذا الجهاز" : "🔕 إشعارات الامتحانات الجديدة متوقفة على هذا الجهاز") + '</p>' +
+      '<button class="btn-plain" data-act="notif">' + (notifOn ? "إيقاف الإشعارات" : "تفعيل الإشعارات") + '</button></section>' : "") +
+    (db.settings.features.complaints ? '<div class="hr"></div><button class="btn btn-orange" data-act="complaint">📢 تقديم شكوى أو ملاحظة</button>' : "") +
+  '</section></main>';
+}
+
+function examsView(){
+  var st = db.settings, s = S.student;
+  var items = db.exams.map(function(e){
+    var taken = db.results.filter(function(r){ return r.examId === e.id && r.phone === s.phone; })[0];
+    var n = e.questions.length;
+    var body = '<div class="ico" aria-hidden="true">📝</div><div class="txt"><h3>' + esc(e.title) + '</h3>' + (e.desc ? '<p>' + esc(e.desc) + '</p>' : "") + '</div>' +
+      '<div class="side"><span class="pill">' + n + ' سؤال</span>' +
+      (e.locked ? '<span class="pill lock">🔒 مقفل</span>' : taken ? '<span class="pill done">✓ ' + taken.score + '/' + taken.total + '</span>' : "") + '</div>';
+    return e.locked ? '<div class="exam locked" aria-disabled="true">' + body + '</div>'
+                    : '<button class="exam" data-act="openexam" data-id="' + esc(e.id) + '">' + body + '</button>';
+  }).join("");
+  return '<main class="xwrap">' +
+    '<header class="hero"><div class="seal" aria-hidden="true">📖</div><h1>' + esc(st.listTitle) + '</h1><div class="rule"></div><p>إعداد وإشراف: ' + esc(st.teacher) + '</p></header>' +
+    '<section class="xcard welcome">مرحباً، ' + esc(s.name) + '</section>' +
+    '<h2 class="sect">📋 اختر الامتحان المطلوب</h2>' +
+    '<div class="list">' + (items || '<p class="empty">لا توجد امتحانات حالياً.</p>') + '</div>' +
+    '<button class="ghost" data-act="home">← العودة للتسجيل</button></main>';
+}
+
+function quizView(){
+  var e = S.exam, q = e.questions[S.qi], n = e.questions.length;
+  var answered = S.ans.filter(function(a){ return a !== undefined; }).length;
+  var L = ["أ","ب","ج","د"];
+  var isLast = S.qi === n - 1;
+  return '<main class="xwrap">' +
+    '<header class="qhead"><button class="ghost sm danger" data-act="quit">' + (S.pd === "quit" ? "تأكيد الخروج؟" : "× خروج") + '</button><div class="qtitle">' + esc(e.title) + '</div></header>' +
+    '<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + answered + '"><i style="width:' + (answered / n * 100) + '%"></i></div>' +
+    '<p class="qmeta">سؤال ' + (S.qi + 1) + ' من ' + n + ' · أجبت على ' + answered + '</p>' +
+    '<section class="xcard"><h2 class="qtext">' + esc(q.q) + '</h2>' + imgTag(q.img, "qimg") + '<div class="opts">' +
+      q.opts.map(function(o,i){ return '<button class="opt' + (S.ans[S.qi] === i ? " sel" : "") + '" data-act="pick" data-i="' + i + '"><span class="l">' + L[i] + '</span><span>' + esc(o) + '</span></button>'; }).join("") +
+    '</div></section>' +
+    '<div class="dots">' + e.questions.map(function(_,i){ return '<button class="dot' + (i === S.qi ? " c" : S.ans[i] !== undefined ? " a" : "") + '" data-act="goq" data-i="' + i + '" aria-label="سؤال ' + (i + 1) + '">' + (i + 1) + '</button>'; }).join("") + '</div>' +
+    (S.confirm ? '<p class="warn" role="alert">لسه ' + (n - answered) + ' سؤال بدون إجابة. اضغط «إنهاء وتسليم» تاني لو متأكد.</p>' : "") +
+    '<div class="nav"><button class="xbtn" data-act="prev"' + (S.qi === 0 ? " disabled" : "") + '>→ السابق</button>' +
+      (isLast ? '<button class="xbtn gold" data-act="finish">إنهاء وتسليم ✓</button>' : '<button class="xbtn gold" data-act="next">التالي ←</button>') + '</div>' +
+  '</main>';
+}
+
+function resultView(){
+  var r = S.res, p = Math.round(r.score / r.total * 100), L = ["أ","ب","ج","د"];
+  var review = (r.qs || []).map(function(q,i){
+    var mine = r.answers[i];
+    return '<article><h3>' + (i + 1) + '. ' + esc(q.q) + '</h3>' + imgTag(imgFor(r, i, q), "qimg") + '<div class="opts">' + q.opts.map(function(o,j){
+      var cls = j === q.ans ? " ok" : (j === mine ? " bad" : "");
+      return '<div class="opt' + cls + '"><span class="l">' + L[j] + '</span><span>' + esc(o) + (j === mine ? " ← إجابتك" : "") + '</span></div>';
+    }).join("") + '</div></article>';
+  }).join("");
+  return '<main class="xwrap">' +
+    '<header class="hero"><div class="seal" aria-hidden="true">🏆</div><h1>' + esc(r.examTitle) + '</h1><div class="rule"></div><p>' + esc(r.name) + '</p></header>' +
+    '<section class="xcard score"><div class="ring" style="--p:' + p + '"><div><b>' + r.score + '/' + r.total + '</b><span>' + p + '%</span></div></div>' +
+      '<div class="grade">' + gradeOf(p) + '</div>' +
+      '<div class="codebox"><small>كود نتيجتك (احتفظ به)</small><b>' + esc(r.code) + '</b><button class="ghost sm" data-act="copy" data-code="' + esc(r.code) + '">نسخ الكود</button></div>' +
+      '<small style="color:var(--x-muted)">' + fmtDate(r.ts) + '</small></section>' +
+    (review ? '<h2 class="sect">مراجعة الإجابات</h2><section class="xcard rev">' + review + '</section>' : "") +
+    '<button class="ghost" data-act="resback">← رجوع</button></main>';
+}
+
+function teacherView(){
+  var tabs = [["exams","الامتحانات"],["results","النتائج"],["complaints","الشكاوى"]];
+  var body = "";
+  if (S.tTab === "exams") body = tExams();
+  else if (S.tTab === "results") body = tResults();
+  else body = tComplaints();
+  return '<main class="xwrap">' +
+    '<header class="hero"><div class="seal" aria-hidden="true">🔐</div><h1>لوحة المدرس</h1><div class="rule"></div></header>' +
+    '<nav class="tabs" aria-label="أقسام اللوحة">' + tabs.map(function(t){ return '<button class="ghost' + (S.tTab === t[0] ? " on" : "") + '" data-act="ttab" data-id="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</nav>' +
+    body + '<button class="ghost" data-act="tout">← خروج من اللوحة</button></main>';
+}
+function tExams(){
+  var L = ["أ","ب","ج","د"];
+  var form = S.tNew ? '<form class="titem xf" id="f-exam" novalidate><h3>امتحان جديد</h3>' +
+      '<label for="x-title">عنوان الامتحان</label><input class="field" id="x-title">' +
+      '<label for="x-desc">وصف قصير</label><input class="field" id="x-desc">' +
+      (S.terr ? '<p class="err" role="alert">' + esc(S.terr) + '</p>' : "") +
+      '<div class="tbtns"><button class="xbtn gold" type="submit" style="width:auto;flex:1">إنشاء</button><button type="button" class="xbtn" data-act="newexam" style="width:auto;flex:1">إلغاء</button></div></form>'
+    : '<button class="xbtn gold" data-act="newexam">＋ امتحان جديد</button>';
+  var list = db.exams.map(function(e){
+    var open = S.tEdit === e.id;
+    var qs = "";
+    if (open){
+      qs = e.questions.map(function(q,i){ return '<div class="qrow">' + (safeImg(q.img) ? '<img class="thumb" src="' + safeImg(q.img) + '" alt="">' : "") + '<span>' + (i + 1) + '. ' + esc(q.q) + ' <small>(الصحيحة: ' + L[q.ans] + ')</small></span><button class="ghost sm danger" data-act="delq" data-id="' + esc(e.id) + '" data-i="' + i + '">حذف</button></div>'; }).join("") || '<p class="empty">لا توجد أسئلة بعد.</p>';
+      qs += '<form class="xf" id="f-q" novalidate><label for="q-text">نص السؤال</label><textarea class="field" id="q-text" rows="3"></textarea>' +
+        '<label for="q-img">صورة للسؤال (اختياري)</label><input class="field" id="q-img" type="file" accept="image/*">' + (S.qImg ? '<div class="qrow"><img class="thumb" src="' + safeImg(S.qImg) + '" alt=""><span>تم اختيار الصورة</span><button type="button" class="ghost sm danger" data-act="rmimg">إزالة</button></div>' : "") +
+        [0,1,2,3].map(function(i){ return '<label for="q-o' + i + '">الاختيار ' + L[i] + '</label><input class="field" id="q-o' + i + '">'; }).join("") +
+        '<label for="q-ans">الإجابة الصحيحة</label><select class="field" id="q-ans">' + L.map(function(l,i){ return '<option value="' + i + '">' + l + '</option>'; }).join("") + '</select>' +
+        (S.terr ? '<p class="err" role="alert">' + esc(S.terr) + '</p>' : "") +
+        '<button class="xbtn gold" type="submit">＋ إضافة السؤال</button></form>' + bulkUi();
+    }
+    return '<article class="titem"><div><h3>' + esc(e.title) + '</h3>' + (e.desc ? '<p>' + esc(e.desc) + '</p>' : "") + '<small>' + e.questions.length + ' سؤال · ' + (e.locked ? "مقفل" : "مفتوح للطلاب") + '</small></div>' +
+      '<div class="tbtns"><button class="ghost sm" data-act="lock" data-id="' + esc(e.id) + '">' + (e.locked ? "🔓 فتح الامتحان" : "🔒 قفل الامتحان") + '</button>' +
+      '<button class="ghost sm' + (open ? " on" : "") + '" data-act="editq" data-id="' + esc(e.id) + '">الأسئلة</button>' +
+      '<button class="ghost sm danger" data-act="delexam" data-id="' + esc(e.id) + '">' + (S.pd === "de" + e.id ? "تأكيد الحذف؟" : "حذف") + '</button></div>' + qs + '</article>';
+  }).join("");
+  return form + (list || '<p class="empty">لا توجد امتحانات.</p>');
+}
+function tResults(){
+  var rs = db.results.slice().sort(function(a,b){ return b.ts - a.ts; });
+  var avg = rs.length ? Math.round(rs.reduce(function(a,r){ return a + r.score / r.total * 100; }, 0) / rs.length) : 0;
+  return '<p class="stat">' + rs.length + ' محاولة · المتوسط ' + avg + '%</p>' + (rs.map(function(r){
+    return '<article class="titem"><div><h3>' + esc(r.name) + '</h3><p dir="ltr" style="text-align:right">' + esc(r.phone) + '</p><small>' + esc(r.examTitle) + ' · ' + r.score + '/' + r.total + ' · الكود ' + esc(r.code) + ' · ' + fmtDate(r.ts) + '</small></div>' +
+      '<div class="tbtns"><button class="ghost sm danger" data-act="delres" data-id="' + esc(r.code) + '">' + (S.pd === "dr" + r.code ? "تأكيد الحذف؟" : "حذف النتيجة") + '</button></div></article>';
+  }).join("") || '<p class="empty">لم يحل أحد أي امتحان بعد.</p>');
+}
+function tComplaints(){
+  return db.complaints.slice().reverse().map(function(c){
+    var i = db.complaints.indexOf(c);
+    return '<article class="titem"><div><h3>' + esc(c.name || "بدون اسم") + '</h3><p>' + esc(c.text) + '</p><small>' + fmtDate(c.ts) + '</small></div>' +
+      '<div class="tbtns"><button class="ghost sm danger" data-act="delcomp" data-i="' + i + '">حذف</button></div></article>';
+  }).join("") || '<p class="empty">لا توجد شكاوى.</p>';
+}
+function bulkUi(){
+  var h = '<button class="ghost sm" data-act="bulk">' + (S.bulk ? "إخفاء" : "📋 إضافة أسئلة كتير مرة واحدة") + '</button>';
+  if (!S.bulk) return h;
+  return h + '<form class="xf" id="f-bulk" novalidate><p class="stat" style="text-align:start">اكتب كل سؤال في فقرة، وسيب سطر فاضي بين الأسئلة:<br>نص السؤال<br>أ) الاختيار الأول<br>ب) الاختيار الثاني<br>ج) الاختيار الثالث<br>د) الاختيار الرابع<br>الإجابة: ب</p>' +
+    '<textarea class="field" id="b-text" rows="10" aria-label="الأسئلة"></textarea>' +
+    (S.berr ? '<p class="err" role="alert">' + esc(S.berr) + '</p>' : "") +
+    '<button class="xbtn gold" type="submit">إضافة الأسئلة</button></form>';
+}
+
+/* ---------- developer panel (yours, hidden from the client) ---------- */
+function kv(k, v){ return '<div class="qrow"><span>' + k + '</span><b>' + v + '</b></div>'; }
+function devView(){
+  var tabs = [["overview","نظرة عامة"],["settings","الإعدادات"],["passwords","كلمات السر"],["data","البيانات"]];
+  var body = S.dTab === "settings" ? dSettings() : S.dTab === "passwords" ? dPasswords() : S.dTab === "data" ? dData() : dOverview();
+  return '<main class="xwrap"><header class="hero"><div class="seal" aria-hidden="true">🛠️</div><h1>لوحة المبرمج</h1><div class="rule"></div><p>هذه اللوحة لك أنت فقط</p></header>' +
+    '<nav class="tabs" aria-label="أقسام لوحة المبرمج">' + tabs.map(function(t){ return '<button class="ghost' + (S.dTab === t[0] ? " on" : "") + '" data-act="dtab" data-id="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</nav>' +
+    body + '<button class="ghost" data-act="dout">← خروج من اللوحة</button></main>';
+}
+function dOverview(){
+  var nq = 0, ni = 0;
+  db.exams.forEach(function(e){ nq += e.questions.length; e.questions.forEach(function(q){ if (q.img) ni++; }); });
+  var kb = Math.round(JSON.stringify(db).length / 1024);
+  return '<section class="titem"><h3>ملخص المنصة</h3>' + kv("الامتحانات", db.exams.length) + kv("الأسئلة", nq) + kv("الأسئلة المصورة", ni) +
+    kv("نتائج الطلاب", db.results.length) + kv("الشكاوى", db.complaints.length) + kv("حجم البيانات", kb + " KB") + '</section>' +
+    '<section class="titem"><h3>للدخول إلى هذه اللوحة</h3><p>اضغط على أيقونة الكتب في شاشة الدخول 5 مرات بسرعة، أو أضف <span dir="ltr">#dev</span> في آخر رابط المنصة.</p>' +
+    '<p>البيانات حالياً محفوظة داخل متصفح كل جهاز. لو المدرس هيشوف نتائج الطلاب من جهاز تاني لازم قاعدة بيانات مشتركة.</p></section>';
+}
+function dSettings(){
+  var s = db.settings, c = s.credits || ["","",""], f = s.features || {};
+  return '<form class="titem xf" id="f-dsettings" novalidate><h3>هوية المنصة</h3>' +
+    '<label for="s-platform">اسم المنصة</label><input class="field" id="s-platform" value="' + esc(s.platform) + '">' +
+    '<label for="s-teacher">اسم المدرس</label><input class="field" id="s-teacher" value="' + esc(s.teacher) + '">' +
+    '<label for="s-list">عنوان صفحة الامتحانات</label><input class="field" id="s-list" value="' + esc(s.listTitle) + '">' +
+    '<h3>بطاقة الأسماء في شاشة الدخول</h3>' +
+    '<label for="s-c0">المبرمج</label><input class="field" id="s-c0" value="' + esc(c[0]) + '">' +
+    '<label for="s-c1">إضافة أسئلة</label><input class="field" id="s-c1" value="' + esc(c[1]) + '">' +
+    '<label for="s-c2">تصميم</label><input class="field" id="s-c2" value="' + esc(c[2]) + '">' +
+    '<h3>ما يظهر للطلاب</h3>' +
+    '<label class="chk"><input type="checkbox" id="s-f-comp"' + (f.complaints ? " checked" : "") + '> زر تقديم الشكاوى</label>' +
+    '<label class="chk"><input type="checkbox" id="s-f-notif"' + (f.notif ? " checked" : "") + '> صندوق الإشعارات</label>' +
+    '<button class="xbtn gold" type="submit">حفظ</button></form>';
+}
+function dPasswords(){
+  var s = db.settings;
+  return '<form class="titem xf" id="f-dpasswords" novalidate><h3>كلمات السر</h3>' +
+    '<p>كلمة سر المدرس تُعطيها للعميل. كلمة سر المبرمج لك أنت فقط.</p>' +
+    '<label for="p-teacher">كلمة سر المدرس</label><input class="field ltr" id="p-teacher" value="' + esc(s.pass) + '">' +
+    '<label for="p-dev">كلمة سر المبرمج</label><input class="field ltr" id="p-dev" value="' + esc(s.devPass) + '">' +
+    (S.derr ? '<p class="err" role="alert">' + esc(S.derr) + '</p>' : "") +
+    '<button class="xbtn gold" type="submit">حفظ</button></form>';
+}
+function dData(){
+  return '<section class="titem xf"><h3>نسخة احتياطية</h3><p>انسخ النص واحفظه عندك. ترجعه من خانة الاستيراد.</p>' +
+    '<textarea class="field mono" id="d-export" rows="6" readonly aria-label="النسخة الاحتياطية">' + esc(JSON.stringify(db)) + '</textarea>' +
+    '<button class="ghost sm" data-act="dcopy">نسخ النسخة الاحتياطية</button></section>' +
+    '<section class="titem xf"><h3>استيراد نسخة</h3><textarea class="field mono" id="d-import" rows="6" placeholder="الصق النسخة الاحتياطية هنا" aria-label="استيراد"></textarea>' +
+    (S.derr ? '<p class="err" role="alert">' + esc(S.derr) + '</p>' : "") +
+    '<button class="ghost sm danger" data-act="dimport">' + (S.pd === "imp" ? "تأكيد: سيتم استبدال كل البيانات" : "استيراد واستبدال البيانات") + '</button></section>' +
+    '<section class="titem"><h3>تصفير</h3><div class="tbtns">' +
+    '<button class="ghost sm danger" data-act="dclear">' + (S.pd === "clr" ? "تأكيد الحذف؟" : "حذف كل نتائج الطلاب") + '</button>' +
+    '<button class="ghost sm danger" data-act="dreset">' + (S.pd === "rst" ? "تأكيد الإرجاع؟" : "إرجاع الامتحانات التجريبية") + '</button></div></section>';
+}
+
+function modalHtml(){
+  if (S.modal === "complaint"){
+    return '<div class="ov"><form class="modal" id="f-complaint" role="dialog" aria-modal="true" aria-labelledby="m-t" novalidate><h2 id="m-t">📢 تقديم شكوى أو ملاحظة</h2>' +
+      '<input class="field" id="c-name" placeholder="الاسم (اختياري)" aria-label="الاسم">' +
+      '<textarea class="field" id="c-text" placeholder="اكتب شكواك هنا" aria-label="نص الشكوى" data-af></textarea>' +
+      (S.cerr ? '<p class="err" role="alert">' + esc(S.cerr) + '</p>' : "") +
+      '<div class="row"><button class="btn btn-orange" type="submit">إرسال</button><button type="button" class="btn-plain" data-act="closemodal">إلغاء</button></div></form></div>';
+  }
+  if (S.modal === "tpass"){
+    return '<div class="ov"><form class="modal" id="f-tpass" role="dialog" aria-modal="true" aria-labelledby="m-t" novalidate><h2 id="m-t">🔐 دخول المدرس</h2>' +
+      '<input class="field ltr" id="t-pass" type="password" placeholder="كلمة السر" aria-label="كلمة السر" data-af>' +
+      (S.terr ? '<p class="err" role="alert">' + esc(S.terr) + '</p>' : "") +
+      '<div class="row"><button class="btn btn-blue" type="submit">دخول</button><button type="button" class="btn-plain" data-act="closemodal">إلغاء</button></div></form></div>';
+  }
+  if (S.modal === "dpass"){
+    return '<div class="ov"><form class="modal" id="f-dpass" role="dialog" aria-modal="true" aria-labelledby="m-t" novalidate><h2 id="m-t">🛠️ لوحة المبرمج</h2>' +
+      '<input class="field ltr" id="d-pass" type="password" placeholder="كلمة سر المبرمج" aria-label="كلمة سر المبرمج" data-af>' +
+      (S.derr ? '<p class="err" role="alert">' + esc(S.derr) + '</p>' : "") +
+      '<div class="row"><button class="btn btn-blue" type="submit">دخول</button><button type="button" class="btn-plain" data-act="closemodal">إلغاء</button></div></form></div>';
+  }
+  return "";
+}
+
+var views = { login: loginView, exams: examsView, quiz: quizView, result: resultView, teacher: teacherView, dev: devView };
+
+function render(){
+  var y = window.scrollY, focusId = document.activeElement && document.activeElement.id;
+  $app.innerHTML = views[S.view]() + modalHtml() + creditsHtml();
+  var els = $app.querySelectorAll("input,textarea,select");
+  for (var i = 0; i < els.length; i++){ var el = els[i]; if (el.id && draft[el.id] !== undefined) el.value = draft[el.id]; }
+  var af = $app.querySelector("[data-af]");
+  if (af) af.focus(); else if (focusId){ var f = document.getElementById(focusId); if (f && f.focus) f.focus(); }
+  if (S.reset){ window.scrollTo(0, 0); S.reset = false; } else window.scrollTo(0, y);
+}
+
+/* ============ events ============ */
+document.addEventListener("input", function(e){ if (e.target.id && e.target.type !== "file") draft[e.target.id] = e.target.value; });
+document.addEventListener("change", function(e){
+  if (e.target.id && e.target.type !== "file") draft[e.target.id] = e.target.value;
+  if (e.target.id === "q-img" && e.target.files && e.target.files[0]){
+    shrinkImage(e.target.files[0], function(u){ if (!u){ toast("تعذر قراءة الصورة"); return; } S.qImg = u; render(); });
+  }
+});
+function clearDraft(ids){ ids.forEach(function(i){ delete draft[i]; }); }
+
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-act]"); if (!t) return;
+  var a = t.getAttribute("data-act"), id = t.getAttribute("data-id"), i = parseInt(t.getAttribute("data-i"), 10), code = t.getAttribute("data-code");
+  if (a === "theme"){
+    var cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    dev.theme = cur === "dark" ? "light" : "dark"; saveDev(); applyTheme();
+  }
+  else if (a === "teacher"){ if (S.tauth){ S.tTab = "exams"; go("teacher"); } else { S.modal = "tpass"; S.terr = ""; render(); } }
+  else if (a === "closemodal"){ S.modal = null; render(); }
+  else if (a === "complaint"){ S.modal = "complaint"; S.cerr = ""; if (S.student && draft["c-name"] === undefined) draft["c-name"] = S.student.name; render(); }
+  else if (a === "notif"){
+    dev.notif = !dev.notif; saveDev(); if (dev.notif) askNotifPermission(); render();
+  }
+  else if (a === "hidecredits"){ S.hideCredits = true; render(); }
+  else if (a === "opencode"){ var r = db.results.filter(function(x){ return x.code === code; })[0]; if (r){ S.res = r; S.from = "login"; go("result"); } }
+  else if (a === "copy"){
+    var done = function(){ toast("تم نسخ الكود"); };
+    try { navigator.clipboard.writeText(code).then(done, function(){ toast("الكود: " + code); }); } catch(err){ toast("الكود: " + code); }
+  }
+  else if (a === "home"){ S.student = null; go("login"); }
+  else if (a === "resback"){ go(S.from === "exams" && S.student ? "exams" : "login"); }
+  else if (a === "openexam"){
+    var ex = examById(id);
+    if (!ex || ex.locked) return;
+    if (!ex.questions.length){ toast("لا توجد أسئلة في هذا الامتحان بعد"); return; }
+    var prev = db.results.filter(function(r){ return r.examId === id && r.phone === S.student.phone; })[0];
+    if (prev){ S.res = prev; S.from = "exams"; toast("سبق أن أديت هذا الامتحان"); go("result"); return; }
+    S.exam = JSON.parse(JSON.stringify(ex)); S.qi = 0; S.ans = []; S.confirm = false; go("quiz");
+  }
+  else if (a === "pick"){ S.ans[S.qi] = i; S.confirm = false; render(); }
+  else if (a === "next"){ if (S.qi < S.exam.questions.length - 1){ S.qi++; S.reset = true; render(); } }
+  else if (a === "prev"){ if (S.qi > 0){ S.qi--; S.reset = true; render(); } }
+  else if (a === "goq"){ S.qi = i; S.reset = true; render(); }
+  else if (a === "quit"){ if (twoStep("quit")) go("exams"); }
+  else if (a === "finish"){ finishExam(); }
+  /* teacher */
+  else if (a === "ttab"){ S.tTab = id; S.tEdit = null; S.tNew = false; S.terr = ""; render(); }
+  else if (a === "tout"){ S.tauth = false; go("login"); }
+  else if (a === "newexam"){ S.tNew = !S.tNew; S.terr = ""; render(); }
+  else if (a === "lock"){ var l = examById(id); if (l){ l.locked = !l.locked; save(); render(); } }
+  else if (a === "editq"){ S.tEdit = S.tEdit === id ? null : id; S.terr = ""; S.qImg = ""; S.bulk = false; S.berr = ""; render(); }
+  else if (a === "delq"){ var dq = examById(id); if (dq){ dq.questions.splice(i, 1); save(); render(); } }
+  else if (a === "delexam"){ if (twoStep("de" + id)){ db.exams = db.exams.filter(function(x){ return x.id !== id; }); save(); render(); } }
+  else if (a === "delres"){ if (twoStep("dr" + id)){ db.results = db.results.filter(function(x){ return x.code !== id; }); save(); render(); } }
+  else if (a === "delcomp"){ db.complaints.splice(i, 1); save(); render(); }
+  else if (a === "rmimg"){ S.qImg = ""; render(); }
+  else if (a === "bulk"){ S.bulk = !S.bulk; S.berr = ""; render(); }
+  /* developer */
+  else if (a === "logo"){ tapN++; clearTimeout(tapT); tapT = setTimeout(function(){ tapN = 0; }, 2500); if (tapN >= 5){ tapN = 0; openDev(); } }
+  else if (a === "dtab"){ S.dTab = id; S.derr = ""; render(); }
+  else if (a === "dout"){ S.dauth = false; go("login"); }
+  else if (a === "dcopy"){
+    var txt = JSON.stringify(db);
+    try { navigator.clipboard.writeText(txt).then(function(){ toast("تم نسخ النسخة الاحتياطية"); }, function(){ var ta = document.getElementById("d-export"); if (ta){ ta.select(); } toast("حدّد النص وانسخه"); }); }
+    catch(err){ var tb = document.getElementById("d-export"); if (tb){ tb.select(); } toast("حدّد النص وانسخه"); }
+  }
+  else if (a === "dimport"){
+    if (twoStep("imp")){
+      var raw = (document.getElementById("d-import") || {}).value || "", p;
+      try { p = JSON.parse(raw); } catch(err){ S.derr = "النص ده مش نسخة احتياطية سليمة."; return render(); }
+      if (!p || !Array.isArray(p.exams) || !p.settings){ S.derr = "النسخة ناقصة أو من منصة تانية."; return render(); }
+      db = p; fixDb(); save(); S.derr = ""; clearDraft(["d-import"]); render(); toast("تم استيراد البيانات");
+    }
+  }
+  else if (a === "dclear"){ if (twoStep("clr")){ db.results = []; dev.codes = []; saveDev(); save(); render(); toast("تم حذف نتائج الطلاب"); } }
+  else if (a === "dreset"){ if (twoStep("rst")){ var keep = db.settings; db = seed(); db.settings = keep; fixDb(); save(); render(); toast("تم إرجاع الامتحانات التجريبية"); } }
+});
+
+function finishExam(){
+  var n = S.exam.questions.length, answered = S.ans.filter(function(a){ return a !== undefined; }).length;
+  if (answered < n && !S.confirm){ S.confirm = true; render(); return; }
+  var score = 0;
+  S.exam.questions.forEach(function(q,i){ if (S.ans[i] === q.ans) score++; });
+  var code;
+  do { code = String(Math.floor(10000 + Math.random() * 90000)); } while (db.results.some(function(r){ return r.code === code; }));
+  var answers = []; for (var i = 0; i < n; i++) answers.push(S.ans[i] === undefined ? -1 : S.ans[i]);
+  var r = { code: code, examId: S.exam.id, examTitle: S.exam.title, name: S.student.name, phone: S.student.phone,
+            score: score, total: n, ts: Date.now(), answers: answers, qs: S.exam.questions.map(function(q){ return { q: q.q, opts: q.opts, ans: q.ans }; }) };
+  db.results.push(r); save();
+  dev.codes.push(code); saveDev();
+  S.res = r; S.from = "login"; go("result");
+}
+
+document.addEventListener("submit", function(e){
+  e.preventDefault();
+  var id = e.target.id, v = function(k){ var el = document.getElementById(k); return el ? el.value.trim() : ""; };
+  if (id === "f-login"){
+    var name = v("l-name"), phone = digits(v("l-phone")).replace(/[\s-]/g, "");
+    if (name.split(/\s+/).filter(Boolean).length < 2){ S.err = "اكتب اسمك الثلاثي كامل."; return render(); }
+    if (!/^01[0-9]{9}$/.test(phone)){ S.err = "رقم الموبايل لازم يكون 11 رقم ويبدأ بـ 01."; return render(); }
+    S.student = { name: name, phone: phone };
+    if (dev.notif) askNotifPermission();
+    clearDraft(["l-name","l-phone"]); go("exams");
+  }
+  else if (id === "f-verify"){
+    var c = digits(v("v-code")), ex = v("v-exam");
+    var r = db.results.filter(function(x){ return x.code === c && (!ex || x.examId === ex); })[0];
+    if (!r){ S.verr = "مفيش نتيجة بالكود ده. راجع الكود والامتحان."; return render(); }
+    S.verr = ""; S.res = r; S.from = "login"; clearDraft(["v-code"]); go("result");
+  }
+  else if (id === "f-complaint"){
+    var text = v("c-text");
+    if (text.length < 5){ S.cerr = "اكتب شكواك بشكل أوضح."; return render(); }
+    db.complaints.push({ name: v("c-name"), text: text, ts: Date.now() }); save();
+    clearDraft(["c-name","c-text"]); S.modal = null; render(); toast("تم إرسال الشكوى");
+  }
+  else if (id === "f-tpass"){
+    if (v("t-pass") !== db.settings.pass){ S.terr = "كلمة السر غير صحيحة."; return render(); }
+    S.tauth = true; S.tTab = "exams"; clearDraft(["t-pass"]); go("teacher");
+  }
+  else if (id === "f-exam"){
+    if (!v("x-title")){ S.terr = "اكتب عنوان الامتحان."; return render(); }
+    db.exams.push({ id: "e" + Date.now(), title: v("x-title"), desc: v("x-desc"), locked: true, questions: [] }); save();
+    clearDraft(["x-title","x-desc"]); S.tNew = false; S.terr = ""; S.tEdit = db.exams[db.exams.length - 1].id; render();
+    toast("تم إنشاء الامتحان. أضف الأسئلة ثم افتحه للطلاب.");
+  }
+  else if (id === "f-q"){
+    var ex2 = examById(S.tEdit); if (!ex2) return;
+    var opts = [], ans = parseInt(v("q-ans"), 10), mapped = -1;
+    [0,1,2,3].forEach(function(i){ var t = v("q-o" + i); if (t){ if (i === ans) mapped = opts.length; opts.push(t); } });
+    if (!v("q-text")){ S.terr = "اكتب نص السؤال."; return render(); }
+    if (opts.length < 2){ S.terr = "أضف اختيارين على الأقل."; return render(); }
+    if (mapped < 0){ S.terr = "الإجابة الصحيحة لازم تكون اختيار مكتوب."; return render(); }
+    var nq = { q: v("q-text"), opts: opts, ans: mapped }; if (S.qImg) nq.img = S.qImg; ex2.questions.push(nq); S.qImg = ""; save();
+    clearDraft(["q-text","q-o0","q-o1","q-o2","q-o3","q-ans"]); S.terr = ""; render(); toast("تمت إضافة السؤال");
+  }
+  else if (id === "f-bulk"){
+    var ex3 = examById(S.tEdit); if (!ex3) return;
+    var got = parseBulk(v("b-text"));
+    if (!got.length){ S.berr = "مفيش أسئلة اتقرت. اتأكد إن كل سؤال في فقرة، وبينهم سطر فاضي، وفي سطر «الإجابة: ب»."; return render(); }
+    got.forEach(function(q){ ex3.questions.push(q); }); save();
+    clearDraft(["b-text"]); S.bulk = false; S.berr = ""; render(); toast("تمت إضافة " + got.length + " سؤال");
+  }
+  else if (id === "f-dpass"){
+    if (v("d-pass") !== db.settings.devPass){ S.derr = "كلمة السر غير صحيحة."; return render(); }
+    S.dauth = true; S.dTab = "overview"; clearDraft(["d-pass"]); go("dev");
+  }
+  else if (id === "f-dsettings"){
+    var st = db.settings;
+    st.platform = v("s-platform") || "منصة امتحانات"; st.teacher = v("s-teacher"); st.listTitle = v("s-list") || "امتحانات المنصة";
+    st.credits = [v("s-c0"), v("s-c1"), v("s-c2")];
+    st.features = { complaints: document.getElementById("s-f-comp").checked, notif: document.getElementById("s-f-notif").checked };
+    save(); clearDraft(["s-platform","s-teacher","s-list","s-c0","s-c1","s-c2"]); render(); toast("تم الحفظ");
+  }
+  else if (id === "f-dpasswords"){
+    if (v("p-teacher").length < 4 || v("p-dev").length < 4){ S.derr = "كل كلمة سر لازم تكون 4 حروف أو أرقام على الأقل."; return render(); }
+    db.settings.pass = v("p-teacher"); db.settings.devPass = v("p-dev"); save();
+    clearDraft(["p-teacher","p-dev"]); S.derr = ""; render(); toast("تم حفظ كلمات السر");
+  }
+});
+
+/* a teacher adding an exam in another tab of this browser pings students here */
+window.addEventListener("storage", function(e){
+  if (e.key !== KEY) return;
+  var before = db.exams.length, fresh = jget(KEY);
+  if (!fresh) return;
+  db = fresh;
+  if (db.exams.length > before){ var ne = db.exams[db.exams.length - 1]; notify("امتحان جديد", ne.title); }
+  if (S.view === "login" || S.view === "exams") render();
+});
+
+function openDev(){ if (S.dauth){ S.dTab = "overview"; go("dev"); } else { S.modal = "dpass"; S.derr = ""; render(); } }
+window.addEventListener("hashchange", function(){ if (location.hash === "#dev") openDev(); });
+render();
+if (location.hash === "#dev") openDev();
+</script>
